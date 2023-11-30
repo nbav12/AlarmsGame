@@ -20,9 +20,18 @@ const openSocket = () => {
         }
     })
 
-    ws.on('error', console.log)
+    let isReconnecting = false
+    const handleReconnect = msg => {
+        ws.close();
+        if (isReconnecting) return
+        isReconnecting = true
+        console.log(`SOCKET ${msg}. Trying reconnect...`)
+        setTimeout(openSocket, 5000);
+    }
+
+    ws.on('error', () => handleReconnect('ERROR'))
     ws.on('open', () => console.log('SOCKET OPENED'))
-    ws.on('close', () => console.log('SOCKET CLOSED'))
+    ws.on('close', () => handleReconnect('CLOSED'))
     ws.on('message', async (msg) => {
         const {notificationId, time, threat, isDrill, cities} = JSON.parse(msg).data
         console.log(`Notification ID: ${notificationId}, Time: ${new Date(time * 1000)}, Threat: ${threat}, Is drill: ${isDrill}, Cities: ${cities}`)
