@@ -34,6 +34,7 @@ const openSocket = () => {
     ws.on('close', () => handleReconnect('CLOSED'))
     ws.on('message', async (msg) => {
         const {notificationId, time, threat, isDrill, cities} = JSON.parse(msg).data
+        if (!cities) return
         console.log(`Notification ID: ${notificationId}, Time: ${new Date(time * 1000)}, Threat: ${threat}, Is drill: ${isDrill}, Cities: ${cities}`)
 
         let wasAlarm = false
